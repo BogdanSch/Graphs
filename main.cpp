@@ -23,6 +23,20 @@ int main()
 	cout << "Graph Edges:\n";
 	graph.printGraph();
 
+    cout << "\n";
+
     cout << "The shortest path from A to E:\n";
 	graph.dijkstra(A, E);
+
+    cout << "\n";
+
+	cout << "Minimum Spanning Tree:\n";
+	graph.kruskal();
+
+	cout << "\n";
+	cout << "Removing last edge:\n";
+	graph.removeLastEdge();
+	graph.printGraph();
+
+	return 0;
 }

@@ -127,12 +127,14 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="DisjointSet.cpp" />
     <ClCompile Include="Edge.cpp" />
-    <ClCompile Include="Graphs.cpp" />
+    <ClCompile Include="main.cpp" />
     <ClCompile Include="Vertex.cpp" />
     <ClCompile Include="WeightedGraph.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="DisjointSet.h" />
     <ClInclude Include="Edge.h" />
     <ClInclude Include="Vertex.h" />
     <ClInclude Include="WeightedGraph.h" />

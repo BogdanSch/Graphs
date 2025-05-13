@@ -14,11 +14,13 @@ private:
 	vector<Vertex> vertices;
 	map<Vertex, int> mapVertices(Vertex begin);
 	Vertex findMinDistanceVertex(const map<Vertex, int>& dist, const map<Vertex, bool>& visited);
+	void sortEdges();
 public:
 	WeightedGraph() {}
 	WeightedGraph(vector<Edge> edges, vector<Vertex> vertices) : edges(edges), vertices(vertices) {}
 	~WeightedGraph() {}
 	void addEdge(Vertex from, Vertex to, int weight);
+	void removeLastEdge();
 	//void addVertex(Vertex vertex) { vertices.push_back(vertex); }
 	vector<Edge> getEdges() const { return edges; }
 	vector<Vertex> getVertices() const { return vertices; }
