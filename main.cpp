@@ -2,6 +2,7 @@
 #include "WeightedGraph.h"
 
 using std::cout;
+using std::to_string;
 
 int main()
 {
@@ -32,11 +33,25 @@ int main()
 
 	cout << "Minimum Spanning Tree:\n";
 	graph.kruskal();
-
-	cout << "\n";
+	/*
 	cout << "Removing last edge:\n";
 	graph.removeLastEdge();
-	graph.printGraph();
+	graph.printGraph();*/
+
+    cout << "\n";
+
+    cout << "Prim's Minimum Spanning Tree:\n";
+    map<Vertex, vector<Vertex>> adjacencyList = graph.prim_UAR_ADL();
+
+    for (auto it : adjacencyList)
+    {
+        cout << it.first << ": ";
+        for (Vertex vertex : it.second)
+        {
+            cout << vertex << " ";
+        }
+        cout << "\n";
+    }
 
 	return 0;
 }

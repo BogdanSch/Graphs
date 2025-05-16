@@ -9,6 +9,7 @@ using std::numeric_limits;
 using std::pair;
 using std::cout;
 using std::count;
+using std::find;
 
 void WeightedGraph::sortEdges()
 {
@@ -28,6 +29,83 @@ void WeightedGraph::sortEdges()
         edges.at(minIndex) = edges.at(i);
         edges.at(i) = temp;
     }
+}
+
+vector<Edge> WeightedGraph::getNeighbouringEdges(Vertex origin)
+{
+    vector<Edge> neighbours = {};
+
+    for (const Edge& edge : edges)
+    {
+        if (edge.from == origin || edge.to == origin)
+            neighbours.push_back(edge);
+    }
+
+    return neighbours;
+}
+
+Vertex* WeightedGraph::getUnvisitedVertex(const vector<Vertex>& visitedVertices)
+{
+    for (Vertex& target : vertices)
+    {
+        auto it = find(visitedVertices.begin(), visitedVertices.end(), target);
+
+        if (it == visitedVertices.end())
+        {
+            return &target;
+        }
+    }
+
+    return nullptr;
+}
+
+map<Vertex, vector<Vertex>> WeightedGraph::prim_UAR_ADL()
+{
+    if (edges.empty())
+    {
+        cout << "Graph is empty.\n";
+        return map<Vertex, vector<Vertex>>();
+    }
+
+    Vertex* current = &(vertices.at(0));
+    vector<Vertex> visited = { *current };
+
+    DisjointSet ds(vertices);
+    WeightedGraph mstGraph;
+
+    while (mstGraph.edges.size() <= vertices.size() - 1)
+    {
+        vector<Edge> neighbouringEdges = getNeighbouringEdges(*current);
+
+        if (neighbouringEdges.empty())
+        {
+            current = getUnvisitedVertex(visited);
+            continue;
+        }
+
+        Edge minEdge = neighbouringEdges.at(0);
+
+        for (int i = 1; i < neighbouringEdges.size(); i++)
+        {
+            if (neighbouringEdges.at(i).getWeight() < minEdge.getWeight())
+                minEdge = neighbouringEdges.at(i);
+        }
+
+        if (!ds.connected(minEdge.from, minEdge.to))
+        {
+            mstGraph.addEdge(minEdge.from, minEdge.to, minEdge.getWeight());
+            ds.unite(minEdge.from, minEdge.to);
+        }
+
+        current = getUnvisitedVertex(visited);
+
+        if (current == nullptr)
+            break;
+
+        visited.push_back(*current);
+    }
+
+    return mstGraph.createAdjacencyList();
 }
 
 void WeightedGraph::kruskal()
@@ -184,6 +262,27 @@ void WeightedGraph::dijkstra(Vertex begin, Vertex end)
 	{
 		cout << distances[end] << "\n";
 	}
+}
+
+map<Vertex, vector<Vertex>> WeightedGraph::createAdjacencyList()
+{
+    map<Vertex, vector<Vertex>> adjacencyList;
+
+    for (int i = 0; i < vertices.size(); i++)
+    {
+        adjacencyList[vertices.at(i)] = { };
+    }
+
+    for (int i = 0; i < edges.size(); i++)
+    {
+        Vertex from = edges.at(i).from;
+        Vertex to = edges.at(i).to;
+
+        adjacencyList[from].push_back(to);
+        adjacencyList[to].push_back(from);
+    }
+
+    return adjacencyList;
 }
 
 void WeightedGraph::printGraph()
