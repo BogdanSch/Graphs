@@ -33,10 +33,6 @@ int main()
 
 	cout << "Minimum Spanning Tree:\n";
 	graph.kruskal();
-	/*
-	cout << "Removing last edge:\n";
-	graph.removeLastEdge();
-	graph.printGraph();*/
 
     cout << "\n";
 

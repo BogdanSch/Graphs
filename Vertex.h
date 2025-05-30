@@ -3,6 +3,7 @@
 #include <ostream>
 
 using std::string;
+using std::ostream;
 
 class Vertex
 {

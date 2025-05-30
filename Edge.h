@@ -11,7 +11,7 @@ public:
 	Edge(Vertex from, Vertex to, int weight) : from(from), to(to) { setWeight(weight); }
 	void setWeight(int weight) { this->weight = weight >= 0 ? weight : 0; }
 	int getWeight() const { return weight; }
-	bool operator<(const Edge& other) const noexcept { return this->weight < other.getWeight(); }
-	bool operator==(const Edge& other) const noexcept { return this->weight == other.getWeight() && this->from == other.from && this->to == other.to; }
+	bool operator<(const Edge& other) const { return this->weight < other.getWeight(); }
+	bool operator==(const Edge& other) const { return this->weight == other.getWeight() && this->from == other.from && this->to == other.to; }
 };
 

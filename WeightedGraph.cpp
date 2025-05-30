@@ -1,4 +1,4 @@
-#include "WeightedGraph.h"
+﻿#include "WeightedGraph.h"
 #include "DisjointSet.h"
 #include <map>
 #include <limits>
@@ -59,12 +59,13 @@ Vertex* WeightedGraph::getUnvisitedVertex(const vector<Vertex>& visitedVertices)
     return nullptr;
 }
 
+//O(v * (e + α(v) + v))
 map<Vertex, vector<Vertex>> WeightedGraph::prim_UAR_ADL()
 {
     if (edges.empty())
     {
         cout << "Graph is empty.\n";
-        return map<Vertex, vector<Vertex>>();
+        return createAdjacencyList();
     }
 
     Vertex* current = &(vertices.at(0));
@@ -108,6 +109,7 @@ map<Vertex, vector<Vertex>> WeightedGraph::prim_UAR_ADL()
     return mstGraph.createAdjacencyList();
 }
 
+//O(e^2 + e * α(v))
 void WeightedGraph::kruskal()
 {
     if (edges.empty())
@@ -119,7 +121,6 @@ void WeightedGraph::kruskal()
     sortEdges();
 
     DisjointSet ds(vertices);
-
     WeightedGraph mstGraph;
 
     for (const Edge& edge : edges)
@@ -152,16 +153,16 @@ map<Vertex, int> WeightedGraph::mapVertices(Vertex begin)
     return mappedVertices;
 }
 
-Vertex WeightedGraph::findMinDistanceVertex(const map<Vertex, int>& dist, const map<Vertex, bool>& visited)
+Vertex WeightedGraph::findMinDistanceVertex(const map<Vertex, int>& distances, const map<Vertex, bool>& visited)
 {
     int minDist = numeric_limits<int>::max();
-    Vertex minVertex = vertices[0];
+    Vertex minVertex = vertices.at(0);
 
     for (const Vertex& v : vertices)
     {
-        if (!visited.at(v) && dist.at(v) < minDist)
+        if (!visited.at(v) && distances.at(v) < minDist)
         {
-            minDist = dist.at(v);
+            minDist = distances.at(v);
             minVertex = v;
         }
     }
@@ -169,53 +170,10 @@ Vertex WeightedGraph::findMinDistanceVertex(const map<Vertex, int>& dist, const 
     return minVertex;
 }
 
-void WeightedGraph::addEdge(Vertex from, Vertex to, int weight)
-{
-    Edge newEdge(from, to, weight);
-
-    int countOccurances = count(edges.begin(), edges.end(), newEdge);
-    if (countOccurances > 0) return;
-
-    edges.push_back(newEdge);
-
-    countOccurances = count(vertices.begin(), vertices.end(), from);
-    if (countOccurances <= 0) vertices.push_back(from);
-
-    countOccurances = count(vertices.begin(), vertices.end(), to);
-    if (countOccurances <= 0) vertices.push_back(to);
-}
-
-void WeightedGraph::removeLastEdge()
-{
-	if (edges.size() == 0)
-	{
-		cout << "Graph is empty.\n";
-		return;
-	}
-
-	Edge lastEdge = edges.back();
-	edges.pop_back();
-
-	for (int i = 0; i < vertices.size(); i++)
-	{
-		Vertex vertex = vertices.at(i);
-
-		if (vertex == lastEdge.from || vertex == lastEdge.to)
-		{
-            int countOccurances = count(vertices.begin(), vertices.end(), vertex);
-
-			if (countOccurances == 1)
-			{
-				vertices.erase(vertices.begin() + i);
-				i--;
-			}
-		}
-	}
-}
-
+//O(v * (v + e))
 void WeightedGraph::dijkstra(Vertex begin, Vertex end)
 {
-    if (edges.size() == 0)
+    if (edges.empty())
     {
         cout << "Graph is empty.\n";
         return;
@@ -243,11 +201,11 @@ void WeightedGraph::dijkstra(Vertex begin, Vertex end)
             if (edge.from == neighbour)
             {
                 Vertex to = edge.to;
-                int alt = distances[neighbour] + edge.getWeight();
+                int cost = distances[neighbour] + edge.getWeight();
 
-                if (alt < distances[to])
+                if (cost < distances[to])
                 {
-                    distances[to] = alt;
+                    distances[to] = cost;
                 }
             }
         }
@@ -264,13 +222,32 @@ void WeightedGraph::dijkstra(Vertex begin, Vertex end)
 	}
 }
 
+void WeightedGraph::addEdge(Vertex from, Vertex to, int weight)
+{
+    Edge newEdge(from, to, weight);
+
+    int countOccurances = count(edges.begin(), edges.end(), newEdge);
+    if (countOccurances > 0) return;
+
+    edges.push_back(newEdge);
+
+    countOccurances = count(vertices.begin(), vertices.end(), from);
+    if (countOccurances <= 0) vertices.push_back(from);
+
+    countOccurances = count(vertices.begin(), vertices.end(), to);
+    if (countOccurances <= 0) vertices.push_back(to);
+}
+
+
 map<Vertex, vector<Vertex>> WeightedGraph::createAdjacencyList()
 {
+    if (vertices.empty() || edges.empty()) return map<Vertex, vector<Vertex>>();
+
     map<Vertex, vector<Vertex>> adjacencyList;
 
     for (int i = 0; i < vertices.size(); i++)
     {
-        adjacencyList[vertices.at(i)] = { };
+        adjacencyList[vertices.at(i)] = {};
     }
 
     for (int i = 0; i < edges.size(); i++)
