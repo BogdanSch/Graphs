@@ -15,7 +15,6 @@ private:
 	map<Vertex, int> mapVertices(Vertex begin);
 	Vertex findMinDistanceVertex(const map<Vertex, int>& dist, const map<Vertex, bool>& visited);
 	vector<Edge> getNeighbouringEdges(Vertex origin);
-	Vertex* getUnvisitedVertex(const vector<Vertex>& visitedVertices);
 	void sortEdges();
 public:
 	WeightedGraph() {}

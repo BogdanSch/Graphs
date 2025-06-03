@@ -44,22 +44,6 @@ vector<Edge> WeightedGraph::getNeighbouringEdges(Vertex origin)
     return neighbours;
 }
 
-Vertex* WeightedGraph::getUnvisitedVertex(const vector<Vertex>& visitedVertices)
-{
-    for (Vertex& target : vertices)
-    {
-        auto it = find(visitedVertices.begin(), visitedVertices.end(), target);
-
-        if (it == visitedVertices.end())
-        {
-            return &target;
-        }
-    }
-
-    return nullptr;
-}
-
-//O(v * (e + α(v) + v))
 map<Vertex, vector<Vertex>> WeightedGraph::prim_UAR_ADL()
 {
     if (edges.empty())
@@ -68,42 +52,46 @@ map<Vertex, vector<Vertex>> WeightedGraph::prim_UAR_ADL()
         return createAdjacencyList();
     }
 
-    Vertex* current = &(vertices.at(0));
-    vector<Vertex> visited = { *current };
-
-    DisjointSet ds(vertices);
+    vector<Vertex> visited = { vertices.at(0) };
     WeightedGraph mstGraph;
 
-    while (mstGraph.edges.size() <= vertices.size() - 1)
+    while (visited.size() < vertices.size())
     {
-        vector<Edge> neighbouringEdges = getNeighbouringEdges(*current);
+        Edge minEdge;
+        bool isMinEdgeFound = false;
 
-        if (neighbouringEdges.empty())
+        for (const Vertex& v : visited)
         {
-            current = getUnvisitedVertex(visited);
-            continue;
+            vector<Edge> neighbours = getNeighbouringEdges(v);
+
+            for (const Edge& e : neighbours)
+            {
+                bool fromVisited = find(visited.begin(), visited.end(), e.from) != visited.end();
+                bool toVisited = find(visited.begin(), visited.end(), e.to) != visited.end();
+
+                if ((fromVisited && !toVisited) || (!fromVisited && toVisited))
+                {
+                    if (!isMinEdgeFound || e.getWeight() < minEdge.getWeight())
+                    {
+                        minEdge = e;
+						isMinEdgeFound = true;
+                    }
+                }
+            }
         }
 
-        Edge minEdge = neighbouringEdges.at(0);
-
-        for (int i = 1; i < neighbouringEdges.size(); i++)
+        if (!isMinEdgeFound)
         {
-            if (neighbouringEdges.at(i).getWeight() < minEdge.getWeight())
-                minEdge = neighbouringEdges.at(i);
-        }
-
-        if (!ds.connected(minEdge.from, minEdge.to))
-        {
-            mstGraph.addEdge(minEdge.from, minEdge.to, minEdge.getWeight());
-            ds.unite(minEdge.from, minEdge.to);
-        }
-
-        current = getUnvisitedVertex(visited);
-
-        if (current == nullptr)
+            cout << "Graph is not connected.\n";
             break;
+        }
 
-        visited.push_back(*current);
+        mstGraph.addEdge(minEdge.from, minEdge.to, minEdge.getWeight());
+
+        Vertex next = find(visited.begin(), visited.end(), minEdge.from) == visited.end()
+            ? minEdge.from : minEdge.to;
+
+        visited.push_back(next);
     }
 
     return mstGraph.createAdjacencyList();
@@ -226,18 +214,17 @@ void WeightedGraph::addEdge(Vertex from, Vertex to, int weight)
 {
     Edge newEdge(from, to, weight);
 
-    int countOccurances = count(edges.begin(), edges.end(), newEdge);
-    if (countOccurances > 0) return;
+    bool isEdgePresent = find(edges.begin(), edges.end(), newEdge) != edges.end();
+    if (isEdgePresent) return;
 
     edges.push_back(newEdge);
 
-    countOccurances = count(vertices.begin(), vertices.end(), from);
-    if (countOccurances <= 0) vertices.push_back(from);
+    bool isVertexPresent = find(vertices.begin(), vertices.end(), from) != vertices.end();
+    if (!isVertexPresent) vertices.push_back(from);
 
-    countOccurances = count(vertices.begin(), vertices.end(), to);
-    if (countOccurances <= 0) vertices.push_back(to);
+    isVertexPresent = find(vertices.begin(), vertices.end(), to) != vertices.end();
+    if (!isVertexPresent) vertices.push_back(to);
 }
-
 
 map<Vertex, vector<Vertex>> WeightedGraph::createAdjacencyList()
 {

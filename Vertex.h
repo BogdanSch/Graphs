@@ -7,8 +7,9 @@ using std::ostream;
 
 class Vertex
 {
-public:
+private: 
 	int id;
+public:
 	string name;
 	Vertex(int id, string name) : id(id), name(name) {}
 	Vertex() : id(0), name("") {}
